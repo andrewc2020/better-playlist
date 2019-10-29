@@ -2,7 +2,7 @@ import React from 'react';
 
 import './App.css';
 import {Component} from 'react';
-import { tsConstructorType } from '@babel/types';
+
 
 let defaultStyle = {
   color: "#FFF"
@@ -69,7 +69,7 @@ class HoursCounter extends Component{
 
 class Filter extends Component{
 render(){
-  return (<div><img/><input type="text"></input></div>)
+  return (<div><img/><input type="text"  onKeyUp={event => this.props.onTextChange(event.target.value)}></input></div>)
     
   
 }
@@ -80,7 +80,7 @@ class Playlist extends Component{
     let playlist = this.props.playlist;
     return (
     <div style={{...defaultStyle, width: "25%", display:"inline-block"}}>
-      <img/>
+      <img alt =" "/>
       <h3>{playlist.name}</h3>
       <ul>
         {
@@ -98,7 +98,10 @@ class App extends Component {
   
   constructor(){
     super();
-    this.state = { serverData : {} };
+    this.state = { 
+      serverData : {} ,
+      filterString : ''
+    };
   }
 
   componentDidMount(){
@@ -106,7 +109,9 @@ class App extends Component {
     setTimeout(()=>{
       this.setState({ serverData : fakeServerData});
 
-    },1000)
+    },1000);
+
+    
       
     
       
@@ -125,10 +130,14 @@ class App extends Component {
         <div><h1 style={{...defaultStyle,'font-size':'54px','background-color':'black'}}>{this.state.serverData.user.name}'s Playlists</h1>
           <PlayListCounter playlists = { this.state.serverData.user.playlists}/>
           <HoursCounter playlists = { this.state.serverData.user.playlists}/>
-          <Filter/>
+          <Filter onTextChange={text => {this.setState({filterString : text})}} />
           {
             this.state.serverData.user &&
-              this.state.serverData.user.playlists.map(playlist=> <Playlist playlist = {playlist} />)
+              this.state.serverData.user.playlists.filter(
+                playlist=>
+                playlist.name.toLowerCase().includes(
+                  this.state.filterString.toLowerCase())).map(
+                    playlist=> <Playlist playlist = {playlist} />)
           }
          
           
